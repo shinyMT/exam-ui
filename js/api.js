@@ -1,6 +1,10 @@
 // 访问数据的API接口地址
 var baseApi = "http://127.0.0.1:11011"
 
+// --------------用户通用------------
+ // 登陆
+ var apiLogin = baseApi + "/login"
+
 // ---------------教师---------------
  // 添加试题
  var apiAddSubject = baseApi + "/add/subject"
