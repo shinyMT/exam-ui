@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>查看题库中的题目</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link rel="stylesheet" href="../../layui/css/layui.css" media="all">
+		<script src="../../js/jquery.js"></script>
+		<script src="../../js/jquery.cookie.js"></script>
+		<style type="text/css">
+			.title{
+				font-size: 16px;
+				padding: 5px 0px 5px 10px;
+			}
+			.layui-input{
+				width: 95%;
+				border-radius: 5px;
+				border: 1px solid;
+				margin-left: 5px;
+			}
+			.btn{
+				margin: 10px 0 0 5px;
+			}
+		</style>
+	</head>
+	<body>
+
+		<!-- 包裹搜索结果 -->
+		<div class="result-container">
+			<div class="result" id="result">
+				<!-- 数据表格 -->
+				<table class="layui-hide" id="subject-table" lay-filter="clickEvent"></table>
+			</div>
+		</div>
+
+
+		<script type="text/html" id="barDemo">
+			<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+			<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+		</script>
+
+		<script src="../../js/api.js"></script>
+		<script src="../../layui/layui.js" charset="utf-8"></script>
+		<script>
+			layui.use('table', function() {
+				var table = layui.table
+
+				// 配置表格表头信息和获取数据的地址
+				table.render({
+					elem: '#subject-table',
+					id: 'subjectTable',
+					url: apiShowSubjects,
+					method: 'get',
+					cellMinWidth: 100,
+					cols: [[
+						{field: 'title', title: '题目'},
+						{field: 'choice', title: '选项'},
+						{field: 'type', title: '题目类型', templet: function(d){
+							return d.type == 1 ? '选择题' : '问答题'
+						}},
+						{fixed: 'right', width:180, align:'center', toolbar: '#barDemo'}
+					]]
+				})
+
+				//监听工具条
+				table.on('tool(clickEvent)', function(obj) {
+					var data = obj.data
+					if (obj.event === 'del') {
+						layer.confirm('确定删除该题目吗', function(index) {
+							// 获取待删除的试题ID值
+							var sid = data.id
+							var result = delSubject(sid)
+							if(result == 0){
+								obj.del()
+								layer.close(index)
+							}else{
+								layer.alert("删除失败，请刷新后重试")
+							}
+						})
+					} else if (obj.event === 'edit') {
+						// layer.alert('编辑行：<br>' + JSON.stringify(data))
+						editSubject(data)
+						
+					}
+				})
+			})
+			
+			// 删除题目
+			function delSubject(id){
+				// 定义一个变量存放删除结果
+				var response
+				$.ajax({
+					url: apiDelSubject + "?id=" + id,
+					type: 'get',
+					dataType: 'json',
+					async: false,
+					success: function(data){
+						console.log(data)
+						if(data.code == 0){
+							response = 0
+						}else if(data.code == -1){
+							response = -1
+						}
+					},
+					error: function(data){
+						console.log(data)
+						response = -1
+					}
+				})
+				
+				return response
+			}
+			
+			// 编辑题目
+			function editSubject(data){
+				// 获取题目ID
+				var id = data.id
+				// 获取题目信息
+				var title = data.title
+				// 获取选项信息
+				var choice = data.choice
+				// 获取题目类型
+				var type = data.type
+				layer.open({
+					type: 1,
+					title: '修改试题',
+					area: ['500px', '400px'],
+					content: '<div class="title">题目</div>' + 
+					'<input type="text" name="title" autocomplete="off" value="" class="layui-input" id="title">' +
+					'<div class="title">选项</div>' +
+					'<input type="text" name="choice" autocomplete="off" value="" class="layui-input" id="choice">' +
+					'<div class="title">选项</div>' +
+					'<input type="text" name="type" autocomplete="off" value="" placeholder="请输入完整名称，例如：选择题或问答题" class="layui-input" id="type">' + 
+					'<button type="button" class="layui-btn btn" id="update">提交</button>'
+				})
+				// 给弹窗的输入框赋值
+				$('#title').val(title)
+				$('#choice').val(choice)
+				$('#type').val(function(){
+					return type == 1 ? '选择题' : '问答题'
+				})
+				
+				// 提交结果
+				$('#update').click(function(){
+					// 获取修改后的题目
+					var newTitle = $('#title').val().trim()
+					// 获取修改后的选项
+					var newChoice = $('#choice').val().trim()
+					// 获取修改后的题目类型
+					var newTypeValue = $('#type').val().trim()
+					// 题目类型的值
+					var newType
+					if(newTypeValue == "选择题"){
+						newType = 1
+					}else if(newTypeValue == "问答题"){
+						newType = 2
+					}
+					
+					$.ajax({
+						url: apiUpdateSubject,
+						type: 'post',
+						data: {
+							"id": id,
+							"title": newTitle,
+							"choice": newChoice,
+							"type": newType
+						},
+						success: function(data){
+							// console.log(data)
+							if(data.code == 0){
+								layer.alert("修改成功", function(){
+									window.location.reload()
+								})
+							}else if(data.code == -1){
+								layer.alert("修改失败，请刷新后重试")
+							}
+						},
+						error: function(data){
+							console.log(data)
+							layer.alert("修改失败，网络异常")
+						}
+					})
+				})
+			}
+		</script>
+
+	</body>
+</html>

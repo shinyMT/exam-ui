@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>添加试题</title>
+		<link rel="stylesheet" type="text/css" href="../../layui/css/layui.css" />
+		<script src="../../js/jquery.js"></script>
+		<script src="../../js/jquery.cookie.js"></script>
+		<script src="../../js/vue.js"></script>
+		<style type="text/css">
+			.layui-form{
+				padding-top: 20px;
+			}
+			.layui-elem-quote{
+				width: 77%;
+				margin-left: 20px;
+			}
+			.layui-form-item {
+				width: 80%;
+				margin-left: 20px;
+			}
+			#submitSub{
+				width: 80%;
+				display: flex;
+				justify-content: center;
+			}
+		</style>
+	</head>
+	<body>
+		<form class="layui-form layui-form-pane" action="">
+			<div class="layui-form-item">
+				<label class="layui-form-label">题目</label>
+				<div class="layui-input-block">
+					<input type="text" name="title" autocomplete="off" placeholder="请输入题目" class="layui-input" id="title">
+				</div>
+			</div>
+			<blockquote class="layui-elem-quote layui-text">
+				注：如添加的题目为问答题，可不填选项
+			</blockquote>
+			<div class="layui-form-item">
+				<label class="layui-form-label">选项</label>
+				<div class="layui-input-block">
+					<input type="text" name="title" autocomplete="off"
+						placeholder="以竖线分隔选项，例如：A.答案1 | B.答案2 | C.答案3 | D.答案4" class="layui-input" id="choice">
+				</div>
+			</div>
+			<div class="layui-form-item" pane="">
+				<label class="layui-form-label">题目类型</label>
+				<div class="layui-input-block">
+					<input type="radio" name="type" value="1" title="选择题" checked="">
+					<input type="radio" name="type" value="2" title="问答题">
+				</div>
+			</div>
+			<div id="submitSub">
+				<button type="button" class="layui-btn" v-on:click="addSubject">提交</button>
+			</div>
+		</form>
+
+		<script src="../../layui/layui.js"></script>
+		<script src="../../js/api.js"></script>
+		<script type="text/javascript">
+			layui.use(['form', 'layer'], function(){
+				var form = layui.form
+				var layer = layui.layer
+				// 提交题目信息
+				var submitSub = new Vue({
+					el: '#submitSub',
+					methods:{
+						addSubject: function(){
+							// 获取题目
+							var title = $('#title').val()
+							// 获取选项
+							var choice = $('#choice').val()
+							// 获取题目类型
+							let type = $('input[name="type"]:checked ').val()
+							
+							$.ajax({
+								url: apiAddSubject,
+								type: 'post',
+								data:{
+									"title": title,
+									"choice": choice,
+									"type": type
+								},
+								dataType: 'json',
+								success: function(data){
+									console.log(data)
+									if(data.code == 0){
+										layer.alert("提交成功", function(){
+											window.location.reload()
+										})
+									}else if(data.code == -1){
+										layer.alert("提交失败，请刷新后重试")
+									}
+								},
+								error: function(data){
+									console.log(data)
+								}
+							})
+						}
+					}
+				})
+			})
+		</script>
+	</body>
+</html>
