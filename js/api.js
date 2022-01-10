@@ -4,6 +4,9 @@ var baseApi = "http://127.0.0.1:11011"
 // --------------用户通用------------
  // 登陆
  var apiLogin = baseApi + "/login"
+ 
+ // 修改用户信息
+ var apiChangeInfo = baseApi + "/change"
 
 // ---------------教师---------------
  // 添加试题

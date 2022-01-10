@@ -98,7 +98,7 @@
 					// 教师
 					parents.push('个人信息管理', '考试管理')
 					selfSeconds.push('修改信息')
-					examSeconds.push('添加试题', '管理试题', '生成试卷')
+					examSeconds.push('添加试题', '管理试题', '生成试卷', '批改试卷')
 				}else if(identity == 2){
 					// 学生
 					// 先清空原来的列表数据再赋新值
@@ -129,28 +129,14 @@
 						// 修改主体内容区域的src值
 						if(clickName == '修改信息'){
 							$('#content').attr('src','changeInfo.html')
-						}else if(clickName == '导师选择'){
-							$('#content').attr('src','student/chooseTutor.html')
-						}else if(clickName == '查看学生'){
-							$('#content').attr('src','tutor/showStudents.html')
-						}else if(clickName == '开题'){
-							$('#content').attr('src','student/addReport.html')
-						}else if(clickName == '查看开题报告'){
-							$('#content').attr('src','tutor/showTopic.html')
-						}else if(clickName == '设置时间节点'){
-							$('#content').attr('src', 'admin/setTime.html')
-						}else if(clickName == '添加用户'){
-							$('#content').attr('src', 'admin/addUser.html')
-						}else if(clickName == '提交论文'){
-							$('#content').attr('src', 'student/uploadFile.html')
-						}else if(clickName == '查看论文'){
-							$('#content').attr('src', 'tutor/showThesis.html')
-						}else if(clickName == '成绩查询'){
-							$('#content').attr('src', 'student/searchScore.html')
-						}else if(clickName == '管理用户'){
-							$('#content').attr('src', 'admin/showUsers.html')
-						}else if(clickName == '安排小组'){
-							$('#content').attr('src', 'admin/distributeGroup.html')
+						}else if(clickName == '添加试题'){
+							$('#content').attr('src','teacher/addSubject.html')
+						}else if(clickName == '管理试题'){
+							$('#content').attr('src','teacher/showSubject.html')
+						}else if(clickName == '生成试卷'){
+							$('#content').attr('src','teacher/generatePaper.html')
+						}else if(clickName == '批改试卷'){
+							$('#content').attr('src','teacher/judgePaper.html')
 						}
 					}
 				}
