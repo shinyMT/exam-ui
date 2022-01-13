@@ -3,25 +3,29 @@
 	<head>
 		<meta charset="utf-8">
 		<title>组卷</title>
-		<link rel="stylesheet" type="text/css" href="../../layui/css/layui.css"/>
+		<link rel="stylesheet" type="text/css" href="../../layui/css/layui.css" />
 		<script src="../../js/jquery.js"></script>
 		<script src="../../js/jquery.cookie.js"></script>
 		<script src="../../js/vue.js"></script>
 		<style type="text/css">
-			.container{
+			.container {
 				width: 60%;
 				padding: 10px 0 0 10px;
 			}
-			.layui-elem-quote{
+
+			.layui-elem-quote {
 				margin-top: 10px;
 			}
-			.layui-btn{
+
+			.layui-btn {
 				margin: 0 auto;
 			}
-			#btnBox{
+
+			#btnBox {
 				width: 100%;
 			}
-			#btnBox .layui-btn{
+
+			#btnBox .layui-btn {
 				width: 50%;
 				display: flex;
 				justify-content: center;
@@ -35,61 +39,68 @@
 				设置考试时间
 			</blockquote>
 			<div class="layui-inline">
-			    <label class="layui-form-label">开始时间</label>
-			    <div class="layui-input-inline">
-			        <input type="text" class="layui-input" id="startTime" placeholder="yyyy-MM-dd HH:mm:ss">
-			    </div>
+				<label class="layui-form-label">开始时间</label>
+				<div class="layui-input-inline">
+					<input type="text" class="layui-input" autoComplate="off" id="startTime" placeholder="yyyy-MM-dd HH:mm:ss">
+				</div>
 			</div>
 			<div class="layui-inline">
-			    <label class="layui-form-label">结束时间</label>
-			    <div class="layui-input-inline">
-			        <input type="text" class="layui-input" id="endTime" placeholder="yyyy-MM-dd HH:mm:ss">
-			    </div>
+				<label class="layui-form-label">结束时间</label>
+				<div class="layui-input-inline">
+					<input type="text" class="layui-input" id="endTime" autoComplate="off" placeholder="yyyy-MM-dd HH:mm:ss">
+				</div>
 			</div>
 			<blockquote class="layui-elem-quote layui-text">
 				生成一套试卷
 			</blockquote>
+			<div class="layui-form-item">
+				<label class="layui-form-label">试卷名: </label>
+				<div class="layui-input-block">
+					<input type="text"  id="paperName" name="title" lay-verify="title" autocomplete="off" placeholder="请输入试卷名"
+						class="layui-input">
+				</div>
+			</div>
 			<div id="btnBox">
 				<button type="button" class="layui-btn layui-btn-radius" v-on:click="checkStatus">生成试卷</button>
 			</div>
 		</div>
-		
-		
+
+
 		<script src="../../js/api.js"></script>
 		<script src="../../layui/layui.js"></script>
 		<script type="text/javascript">
-			layui.use('laydate', function(){
+			layui.use('laydate', function() {
 				var laydate = layui.laydate
-				
+
 				// 开始时间
 				laydate.render({
-				    elem: '#startTime',
+					elem: '#startTime',
 					type: 'datetime'
 				})
 				// 结束时间
 				laydate.render({
-				    elem: '#endTime',
+					elem: '#endTime',
 					type: 'datetime'
 				})
-				
+
 				var btnBox = new Vue({
 					el: '#btnBox',
-					methods:{
+					methods: {
 						// 检测是否设置考试时间
-						checkStatus: function(){
+						checkStatus: function() {
 							// 获取考试开始时间
 							var startTime = $('#startTime').val()
 							// 获取考试结束时间
 							var endTime = $('#endTime').val()
 							// 判断是否选择考试时间
-							if(startTime != 0 && endTime != 0){
+							if (startTime != 0 && endTime != 0) {
 								this.setTime(startTime, endTime)
-							}else{
+							} else {
 								layer.alert("请设置考试时间后再生成试卷")
 							}
 						},
 						// 生成考试时间
-						setTime: function(startTime, endTime){
+						setTime: function(startTime, endTime) {
 							// 生成试卷
 							let that = this
 							$.ajax({
@@ -100,35 +111,39 @@
 									"endTime": endTime
 								},
 								dataType: 'json',
-								success: function(data){
-									if(data.code == 0){
+								success: function(data) {
+									if (data.code == 0) {
 										// 生成试卷
 										that.generate()
-									}else if(data.code == -1){
+									} else if (data.code == -1) {
 										layer.alert("设置时间失败，请刷新后重试")
 									}
 								},
-								error: function(data){
+								error: function(data) {
 									console.log(data)
 									layer.alert("设置时间失败，网络异常")
 								}
 							})
 						},
 						// 生成试卷
-						generate: function(){
+						generate: function() {
+							// 获取试卷名
+							var paperName = $('#paperName').val()
+							// 获取登陆用户的code
+							var account = $.cookie('account')
+							// console.log(account)
 							$.ajax({
-								// TODO 修改code为动态
-								url: apiGenerate + "?code=1001",
+								url: apiGenerate + "?code=" + account + "&name=" + paperName,
 								type: 'get',
 								dataType: 'json',
-								success: function(data){
-									if(data.code == 0){
+								success: function(data) {
+									if (data.code == 0) {
 										layer.alert("组卷成功")
-									}else if(data.code == -1){
+									} else if (data.code == -1) {
 										layer.alert("设置时间失败，请刷新后重试")
 									}
 								},
-								error: function(data){
+								error: function(data) {
 									console.log(data)
 									layer.alert("设置时间失败，网络异常")
 								}

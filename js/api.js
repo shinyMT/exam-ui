@@ -1,5 +1,5 @@
 // 访问数据的API接口地址
-var baseApi = "http://127.0.0.1:11011"
+var baseApi = "http://127.0.0.1:11012"
 
 // --------------用户通用------------
  // 登陆
@@ -26,3 +26,10 @@ var baseApi = "http://127.0.0.1:11011"
  
  // 生成试卷
  var apiGenerate = baseApi + "/generate"
+ 
+// ----------------学生---------------
+ // 获取所有试卷
+ var apiGetAllPaper = baseApi + "/all/paper"
+ 
+ // 获取试卷
+ var apiGetPaper = baseApi + "/get/paper"

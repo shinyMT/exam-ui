@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>参加考试</title>
+		<link rel="stylesheet" type="text/css" href="../../layui/css/layui.css" />
+		<script src="../../js/jquery.js"></script>
+		<script src="../../js/jquery.cookie.js"></script>
+		<script src="../../js/vue.js"></script>
+		<style type="text/css">
+			#content {
+				width: 100%;
+				margin: 10px 0 0 10px;
+			}
+
+			.layui-form-item {
+				width: 70%;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="content">
+			<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+				<legend>待完成的考试</legend>
+			</fieldset>
+
+			<div class="layui-bg-gray" style="padding: 30px;" v-for="qa in qaList">
+				<div class="layui-row layui-col-space15">
+					<div class="layui-col-md6">
+						<div class="layui-card">
+							<div class="layui-card-header">待完成</div>
+							<div class="layui-card-body">
+								{{ qa }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<script src="../../layui/layui.js"></script>
+		<script src="../../js/api.js"></script>
+		<script type="text/javascript">
+			$(function() {
+				// 获取所有试卷名
+				$.ajax({
+					url: apiGetAllPaper,
+					type: 'get',
+					dataType: 'json',
+					success: function(data) {
+						// console.log(data)
+						if (data.code == 0) {
+							var result = data.data
+							showAllQa(result)
+						} else if (data.code == -1) {
+							console.log("获取失败")
+						}
+					},
+					error: function(data) {
+						console.log("网络异常")
+					}
+				})
+
+			})
+
+			// 显示所有试卷
+			function showAllQa(result) {
+				// 定义一个存放试卷名的列表
+				var nameList = []
+				var content = new Vue({
+					el: '#content',
+					data: {
+						qaList: []
+					}
+				})
+				for (let i = 0; i < result.length; i++) {
+					var qaName = result[i].name
+					nameList.push(qaName)
+				}
+				console.log(nameList)
+				content.qaList = nameList
+			}
+			// TODO 给试卷添加点击事件，查看对应的试卷详情
+		</script>
+	</body>
+</html>
