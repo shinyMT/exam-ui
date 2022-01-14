@@ -27,7 +27,7 @@
 			<div class="layui-bg-gray" style="padding: 30px;" v-for="qa in qaList">
 				<div class="layui-row layui-col-space15">
 					<div class="layui-col-md6">
-						<div class="layui-card">
+						<div class="layui-card" v-on:click="joinExam($event)">
 							<div class="layui-card-header">待完成</div>
 							<div class="layui-card-body">
 								{{ qa }}
@@ -71,6 +71,32 @@
 					el: '#content',
 					data: {
 						qaList: []
+					},
+					methods:{
+						joinExam: function(event){
+							var examName = event.currentTarget.lastElementChild.innerText
+							$.ajax({
+								url: apiGetPaper,
+								type: 'post',
+								data:{
+									"name": examName
+								},
+								dataType: 'json',
+								success: function(data){
+									// console.log(data)
+									if(data.code == 0){
+										var result = data.data
+										console.log(result)
+										window.open("joinExam.html")
+									}else if(data.code == -1){
+										console.log("获取失败")
+									}
+								},
+								error: function(data){
+									alert("网络异常，请退出后重试")
+								}
+							})
+						}
 					}
 				})
 				for (let i = 0; i < result.length; i++) {
@@ -80,7 +106,6 @@
 				console.log(nameList)
 				content.qaList = nameList
 			}
-			// TODO 给试卷添加点击事件，查看对应的试卷详情
 		</script>
 	</body>
 </html>
