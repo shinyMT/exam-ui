@@ -72,28 +72,48 @@
 					data: {
 						qaList: []
 					},
-					methods:{
-						joinExam: function(event){
+					methods: {
+						joinExam: function(event) {
 							var examName = event.currentTarget.lastElementChild.innerText
+							$.cookie('examName', examName)
+							// 获取当前系统时间
+							var nowTime = new Date().getTime()
+							// console.log(nowTime)
+							// 判断当前是否为考试时间
+							this.checkTime()
+							
+							var start = new Date($.cookie('startTime')).getTime()
+							var end = new Date($.cookie('endTime')).getTime()
+							console.log("开始时间：" + start)
+							console.log("结束时间：" + end)
+							if(nowTime < start){
+								alert("考试暂未开始")
+							}else if(nowTime > end){
+								alert("考试已经结束！")
+							}else{
+								location.href = "joinExam.html"
+							}
+						},
+						checkTime: function() {
+							var startTime
+							var endTime
 							$.ajax({
-								url: apiGetPaper,
-								type: 'post',
-								data:{
-									"name": examName
-								},
+								url: apiGetTime,
+								type: 'get',
 								dataType: 'json',
-								success: function(data){
-									// console.log(data)
-									if(data.code == 0){
-										var result = data.data
-										console.log(result)
-										window.open("joinExam.html")
-									}else if(data.code == -1){
-										console.log("获取失败")
+								async: false,
+								success: function(data) {
+									if (data.code == 0) {
+										var result = data.data[0]
+										// 获取考试起止时间
+										startTime = result.startTime
+										endTime = result.endTime
+										$.cookie('startTime', startTime)
+										$.cookie('endTime', endTime)
 									}
 								},
 								error: function(data){
-									alert("网络异常，请退出后重试")
+									console.log(data)
 								}
 							})
 						}

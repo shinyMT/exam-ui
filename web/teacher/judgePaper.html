@@ -3,31 +3,165 @@
 	<head>
 		<meta charset="utf-8">
 		<title>批改试卷</title>
-		<link rel="stylesheet" type="text/css" href="../../layui/css/layui.css"/>
+		<link rel="stylesheet" type="text/css" href="../../layui/css/layui.css" />
+		<script src="../../js/jquery.js"></script>
+		<script src="../../js/jquery.cookie.js"></script>
+		<script src="../../js/vue.js"></script>
 		<style type="text/css">
-			.searchBox{
+			.searchBox {
 				width: 100%;
 				margin: 10px 0 0 10px;
 				display: flex;
 				justify-content: center;
 			}
-			.inputBox{
+
+			.inputBox {
 				width: 60%;
 				margin-right: 15px;
+			}
+			.subject, .mark{
+				width: 70%;
+				margin-top: 10px;
+				margin-bottom: 10px;
+			}
+			#subject{
+				height: 400px;
+				color: #666666;
+			}
+			.commitBtn{
+				width: 100%;
+				display: flex;
+				justify-content: center;
 			}
 		</style>
 	</head>
 	<body>
 		<!-- 搜索部分 -->
-		<div class="layui-form-item searchBox">
-		    <div class="inputBox">
+		<div class="layui-form-item searchBox" id="search">
+			<div class="inputBox">
 				<label class="layui-form-label">学生学号</label>
 				<div class="layui-input-block">
-				  <input type="text" name="code" lay-verify="code" autocomplete="off" placeholder="请输入学生学号" class="layui-input">
+					<input type="text" autocomplete="off" placeholder="请输入学生学号"
+						class="layui-input" id="code">
+				</div>
+				<br />
+				<label class="layui-form-label">试卷名</label>
+				<div class="layui-input-block">
+					<input type="text" autocomplete="off" placeholder="请输入试卷名"
+						class="layui-input" id="examName">
 				</div>
 			</div>
-			<button type="button" class="layui-btn">搜索</button>
+			<button type="button" class="layui-btn" v-on:click="searchSub">搜索</button>
 		</div>
-		<!-- TODO 显示部分 展示题目和答案 -->
+		<!-- 试卷-->
+		<div class="layui-input-block subject">
+			<textarea class="layui-textarea" id="subject"></textarea>
+		</div>
+		<!-- 打分 -->
+		<div class="layui-input-block mark">
+			<input type="text" name="mark" id="mark" autocomplete="off" placeholder="请输入学生成绩"
+				class="layui-input">
+		</div>
+		<!-- 提交成绩 -->
+		<div class="commitBtn" id="commit">
+			<button type="button" class="layui-btn" v-on:click="commitMark">提交</button>
+		</div>
+		
+		<script src="../../js/api.js"></script>
+		<script type="text/javascript">
+			var search = new Vue({
+				el: '#search',
+				methods:{
+					searchSub: function(){
+						// 根据学号和试卷名获取学生的试卷
+						// 获取输入的学号
+						var code = $('#code').val()
+						var examName = $('#examName').val()
+						
+						// console.log(code + ", " + examName)
+						if(code != null && examName != null){
+							// 获取学生试卷
+							this.getPaper(code, examName)
+						}
+					},
+					getPaper: function(code, name){
+						$.ajax({
+							url: apiGetStudentPaper,
+							type: 'post',
+							data: {
+								"code": code,
+								"name": name
+							},
+							dataType: 'json',
+							success: function(data){
+								console.log(data)
+								var result = data.data[0]
+								
+								// 获取第一题
+								var cqOne = result.cqOne
+								var caOne = result.caOne
+								// 获取第二题
+								var cqTwo = result.cqTwo
+								var caTwo = result.caTwo
+								// 获取第三题
+								var cqThree = result.cqThree
+								var caThree = result.caThree
+								// 获取第四题
+								var eqOne = result.eqOne
+								var eaOne = result.eaOne
+								// 获取第五题
+								var eqTwo = result.eqTwo
+								var eaTwo = result.eaTwo
+								// 将试卷赋值到文本域中
+								$('#subject').val("1. " + cqOne + "\n答：" + caOne + "\n" +
+								"2. " + cqTwo + "\n答：" + caTwo + "\n" +
+								"3. " + cqThree + "\n答：" + caThree + "\n" +
+								"4. " + eqOne + "\n答：" + eaOne + "\n" +
+								"5. " + eqTwo + "\n答：" + eaTwo)
+							},
+							error: function(data){
+								console.log(data)
+							}
+						})
+					}
+				}
+			})
+			
+			var commit = new Vue({
+				el: '#commit',
+				methods:{
+					commitMark: function(){
+						// 获取学生账号和成绩
+						var code = $('#code').val()
+						var mark = $('#mark').val()
+						var examName = $('#examName').val()
+						// console.log(code + ", " + mark)
+						$.ajax({
+							url: apiSetMark,
+							type: 'post',
+							data: {
+								"code": code,
+								"name": examName,
+								"mark": mark
+							},
+							dataType: 'json',
+							success: function(data){
+								console.log(data)
+								if(data.code == 0){
+									alert("打分成功")
+									window.location.reload()
+								}else if(data.code == -1){
+									alert("打分失败，请稍后重试")
+								}
+							},
+							error: function(data){
+								console.log(data)
+								alert("网络异常，请稍后重试")
+							}
+						})
+					}
+				}
+			})
+		</script>
 	</body>
 </html>

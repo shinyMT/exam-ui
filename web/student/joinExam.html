@@ -4,21 +4,299 @@
 		<meta charset="utf-8">
 		<title>在线考试</title>
 		<link rel="stylesheet" type="text/css" href="../../layui/css/layui.css" />
+		<script src="../../js/jquery.js"></script>
+		<script src="../../js/jquery.cookie.js"></script>
+		<script src="../../js/vue.js"></script>
 		<style type="text/css">
-			.content{
+			.content {
 				width: 70%;
 				margin: 10px 0 0 10px;
+			}
+
+			#btnBox {
+				width: 100%;
+				display: flex;
+				justify-content: center;
 			}
 		</style>
 	</head>
 	<body>
-		<!-- 利用v-for循环输入框来获取题目 -->
-		<div class="content">
+		<div class="content" v-for="question in questionList">
+			<!-- 倒计时 -->
+			<blockquote class="layui-elem-quote" style="margin-top: 10px;">
+				<div id="test2"></div>
+			</blockquote>
+			<!-- 第一题 -->
 			<div class="layui-form-item">
+				<label class="layui-form-label">1. </label>
 				<div class="layui-input-block">
-					<input type="text" name="title" lay-verify="title" disabled class="layui-input layui-disabled">
+					<input type="text" name="title" id="cqOne" disabled class="layui-input layui-disabled">
 				</div>
 			</div>
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<input type="text" name="answer" id="caOne" autocomplete="off" placeholder="请输入答案"
+						class="layui-input">
+				</div>
+			</div>
+
+			<!-- 第二题 -->
+			<div class="layui-form-item">
+				<label class="layui-form-label">2. </label>
+				<div class="layui-input-block">
+					<input type="text" name="title" id="cqTwo" disabled class="layui-input layui-disabled">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<input type="text" name="answer" id="caTwo" autocomplete="off" placeholder="请输入答案"
+						class="layui-input">
+				</div>
+			</div>
+
+			<!-- 第三题 -->
+			<div class="layui-form-item">
+				<label class="layui-form-label">3. </label>
+				<div class="layui-input-block">
+					<input type="text" name="title" id="cqThree" disabled class="layui-input layui-disabled">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<input type="text" name="answer" id="caThree" autocomplete="off" placeholder="请输入答案"
+						class="layui-input">
+				</div>
+			</div>
+
+			<!-- 第四题 -->
+			<div class="layui-form-item">
+				<label class="layui-form-label">4. </label>
+				<div class="layui-input-block">
+					<input type="text" name="title" id="eqOne" disabled class="layui-input layui-disabled">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<input type="text" name="answer" id="eaOne" autocomplete="off" placeholder="请输入答案"
+						class="layui-input">
+				</div>
+			</div>
+
+			<!-- 第五题 -->
+			<div class="layui-form-item">
+				<label class="layui-form-label">5. </label>
+				<div class="layui-input-block">
+					<input type="text" name="title" id="eqTwo" disabled class="layui-input layui-disabled">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<input type="text" name="answer" id="eaTwo" autocomplete="off" placeholder="请输入答案"
+						class="layui-input">
+				</div>
+			</div>
+
+			<!-- 提交按钮 -->
+			<div id="btnBox">
+				<button type="button" class="layui-btn" v-on:click="submitPaper">提交试卷</button>
+			</div>
 		</div>
+
+		<script src="../../layui/layui.js"></script>
+		<script src="../../js/api.js"></script>
+		<script type="text/javascript">
+			// 获取传递来的试卷名
+			var examName = $.cookie('examName')
+			// console.log(examName)
+			function getPaperDetail() {
+				$.ajax({
+					url: apiGetPaper,
+					type: 'post',
+					data: {
+						"name": examName
+					},
+					dataType: 'json',
+					success: function(data) {
+						// console.log(data)
+						if (data.code == 0) {
+							var result = data.data[0]
+							// console.log(result)
+							$.cookie("tag", result.tag)
+							// 获取试题
+							getSubjects(result)
+						} else if (data.code == -1) {
+							console.log("获取失败")
+						}
+					},
+					error: function(data) {
+						alert("网络异常，请退出后重试")
+					}
+				})
+			}
+
+			function getSubjects(result) {
+				var cqOne = result.cqOne
+				// var caOne = formatSubject(cqOne)
+				var cqTwo = result.cqTwo
+				// var caTwo = formatSubject(cqTwo)
+				var cqThree = result.cqThree
+				// var caThree = formatSubject(cqThree)
+				var eqOne = result.eqOne
+				var eqTwo = result.eqTwo
+
+
+				$('#cqOne').val(cqOne)
+				$('#cqTwo').val(cqTwo)
+				$('#cqThree').val(cqThree)
+				$('#eqOne').val(eqOne)
+				$('#eqTwo').val(eqTwo)
+			}
+
+			/**
+			 * 将题目根据冒号分解为两部分换行显示
+			 * */
+			function formatSubject(question) {
+				var index = question.indexOf(':')
+				var question1 = question.substring(0, index)
+				var question2 = question.substring(index + 1, question.length)
+				// console.log(question1 + ", " + question2)
+
+				return question1 + " \n " + question2
+			}
+
+			/**
+			 * 提交试卷
+			 * */
+			var btnBox = new Vue({
+				el: '#btnBox',
+				methods: {
+					submitPaper: function() {
+						// 获取第一题题目
+						var cqOne = $('#cqOne').val()
+						// 获取第一题答案
+						var caOne = $('#caOne').val()
+						// 获取第二题题目
+						var cqTwo = $('#cqTwo').val()
+						// 获取第二题答案
+						var caTwo = $('#caTwo').val()
+						// 获取第三题题目
+						var cqThree = $('#cqThree').val()
+						// 获取第三题答案
+						var caThree = $('#caThree').val()
+						// 获取第四题题目
+						var eqOne = $('#eqOne').val()
+						// 获取第四题答案
+						var eaOne = $('#eaOne').val()
+						// 获取第五题题目
+						var eqTwo = $('#eqTwo').val()
+						// 获取第五题答案
+						var eaTwo = $('#eaTwo').val()
+
+						var code = $.cookie('account')
+						// console.log(cqOne + ", " + caOne + ", " + caTwo + ", " + caThree + ", " + eaOne + ", " + eaTwo)
+						$.ajax({
+							url: apiCommit,
+							type: 'post',
+							data:{
+								"code": code,
+								"cqOne": cqOne,
+								"caOne": caOne,
+								"cqTwo": cqTwo,
+								"caTwo": caTwo,
+								"cqThree": cqThree,
+								"caThree": caThree,
+								"eqOne": eqOne,
+								"eaOne": eaOne,
+								"eqTwo": eqTwo,
+								"eaTwo": eaTwo,
+								"qaTag": $.cookie('tag')
+							},
+							success: function(data){
+								if(data.code == 0){
+									alert("提交成功")
+									window.location.reload()
+								}else if(data.code == -1){
+									alert("提交失败，请稍后重试")
+								}else if(data.code == -2){
+									alert("您已提交过试卷，请勿重复提交")
+								}
+							},
+							error: function(data){
+								console.log(data)
+							}
+						})
+					}
+				}
+			})
+
+
+			layui.use(['util', 'laydate', 'layer'], function() {
+				var util = layui.util
+				var layer = layui.layer
+				var laydate = layui.laydate
+
+				//倒计时
+				var thisTimer, setCountdown = function(y, M, d, H, m, s) {
+					var endTime = new Date(y, M || 0, d || 1, H || 0, m || 0, s || 0) //结束时间
+						,
+						serverTime = new Date(); // 获取当前系统时间
+					// 判断当前时间是否已超过结束时间
+					if (serverTime.getTime() >= endTime.getTime()) {
+						// 自动提交试卷
+						btnBox.submitPaper()
+					}
+
+					clearTimeout(thisTimer)
+					util.countdown(endTime, serverTime, function(date, serverTime, timer) {
+						var str = date[0] - 31 + '天' + date[1] + '时' + date[2] + '分' + date[3] + '秒'
+						lay('#test2').html(str)
+						thisTimer = timer
+					});
+				};
+
+				// 获取考试时间
+				var endTime = $.cookie('endTime')
+				// console.log(endTime)
+				var newDate = formartDate(endTime)
+
+				// 将时间分解为年月日时分秒
+				var year = newDate.getFullYear()
+				var month = newDate.getMonth() + 1
+				var day = newDate.getDate()
+				var hour = newDate.getHours()
+				var minute = newDate.getMinutes()
+				var second = newDate.getSeconds()
+
+
+				setCountdown(year, month, day, hour, minute, second)
+
+				laydate.render({
+					elem: '#test2',
+					type: 'datetime',
+					done: function(value, date) {
+						setCountdown(date.year, date.month - 1, date.date, date.hours, date.minutes, date
+							.seconds);
+					}
+				});
+			})
+
+
+			function formartDate(date) {
+				// console.log(date)
+				var newDate = new Date(date)
+
+				// console.log(year + ", " + month + ", " + day + ", " + hour + ", " + minute + ", " + second)
+				return newDate
+			}
+
+			$(function() {
+				// 获取试卷详情
+				getPaperDetail()
+				// // 获取考试时间
+				// var endTime = getExamTime()
+				// // console.log(endTime)
+				// var newDate = formartDate(endTime)
+			})
+		</script>
 	</body>
 </html>
