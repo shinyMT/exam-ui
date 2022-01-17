@@ -84,14 +84,16 @@
 							
 							var start = new Date($.cookie('startTime')).getTime()
 							var end = new Date($.cookie('endTime')).getTime()
-							console.log("开始时间：" + start)
-							console.log("结束时间：" + end)
+							// console.log("开始时间：" + start)
+							// console.log("结束时间：" + end)
 							if(nowTime < start){
 								alert("考试暂未开始")
 							}else if(nowTime > end){
 								alert("考试已经结束！")
 							}else{
-								location.href = "joinExam.html"
+								// location.href = "joinExam.html"
+								window.open ('web/student/joinExam.html', 'newwindow', 
+											'height=980, width=1900, top=10,left=20, toolbar=no, menubar=no, scrollbars=no, resizable=no,location=no, status=no')
 							}
 						},
 						checkTime: function() {

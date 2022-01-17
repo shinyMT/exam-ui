@@ -75,7 +75,7 @@
 			var account = $.cookie('account')
 			var name = $.cookie('name')
 			var identity = $.cookie('identity')
-			// console.log(tag)
+			console.log(account + ", " + identity)
 			// 定义一个变量存储一级目录信息
 			var parents = []
 			// 定义一个变量存储个人信息管理的二级目录
@@ -94,12 +94,12 @@
 			
 			// 根据用户身份加载不同目录结构
 			function checkIdentity(){
-				if(identity == 1){
+				if(identity == 2){
 					// 教师
 					parents.push('个人信息管理', '考试管理')
 					selfSeconds.push('修改信息')
 					examSeconds.push('添加试题', '管理试题', '生成试卷', '批改试卷')
-				}else if(identity == 2){
+				}else if(identity == 3){
 					// 学生
 					// 先清空原来的列表数据再赋新值
 					parents = []

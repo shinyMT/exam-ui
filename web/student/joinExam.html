@@ -136,11 +136,8 @@
 
 			function getSubjects(result) {
 				var cqOne = result.cqOne
-				// var caOne = formatSubject(cqOne)
 				var cqTwo = result.cqTwo
-				// var caTwo = formatSubject(cqTwo)
 				var cqThree = result.cqThree
-				// var caThree = formatSubject(cqThree)
 				var eqOne = result.eqOne
 				var eqTwo = result.eqTwo
 
@@ -152,17 +149,6 @@
 				$('#eqTwo').val(eqTwo)
 			}
 
-			/**
-			 * 将题目根据冒号分解为两部分换行显示
-			 * */
-			function formatSubject(question) {
-				var index = question.indexOf(':')
-				var question1 = question.substring(0, index)
-				var question2 = question.substring(index + 1, question.length)
-				// console.log(question1 + ", " + question2)
-
-				return question1 + " \n " + question2
-			}
 
 			/**
 			 * 提交试卷
