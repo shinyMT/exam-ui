@@ -33,6 +33,12 @@ var baseApi = "http://127.0.0.1:11013"
  // 给学生试卷打分
  var apiSetMark = baseApi + "/set/mark"
  
+ // 查看所有学生成绩
+ var apiGetAllMark = baseApi + "/all/mark"
+ 
+ // 修改学生成绩
+ var apiUpdateMark = baseApi + "/update/mark"
+ 
 // ----------------学生---------------
  // 获取所有试卷
  var apiGetAllPaper = baseApi + "/all/paper"
@@ -45,3 +51,6 @@ var baseApi = "http://127.0.0.1:11013"
  
  // 提交试卷信息
  var apiCommit = baseApi + "/commit"
+ 
+ // 查询成绩
+ var apiGetSelfMark = baseApi + "/search/mark"

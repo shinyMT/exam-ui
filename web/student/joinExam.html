@@ -200,7 +200,7 @@
 							success: function(data){
 								if(data.code == 0){
 									alert("提交成功")
-									window.location.reload()
+									window.location.replace("info.html")
 								}else if(data.code == -1){
 									alert("提交失败，请稍后重试")
 								}else if(data.code == -2){
@@ -223,9 +223,10 @@
 
 				//倒计时
 				var thisTimer, setCountdown = function(y, M, d, H, m, s) {
-					var endTime = new Date(y, M || 0, d || 1, H || 0, m || 0, s || 0) //结束时间
-						,
-						serverTime = new Date(); // 获取当前系统时间
+					// 结束时间
+					var endTime = new Date(y, M || 0, d || 1, H || 0, m || 0, s || 0)
+					// 获取当前系统时间
+					var serverTime = new Date(); 
 					// 判断当前时间是否已超过结束时间
 					if (serverTime.getTime() >= endTime.getTime()) {
 						// 自动提交试卷

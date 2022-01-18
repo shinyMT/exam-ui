@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>查看所有成绩</title>
+		<link rel="stylesheet" type="text/css" href="../../layui/css/layui.css" />
+		<script src="../../js/jquery.js"></script>
+		<script src="../../js/jquery.cookie.js"></script>
+		<script src="../../js/vue.js"></script>
+		<style type="text/css">
+			.searchBox {
+				width: 100%;
+				margin: 10px 0 0 10px;
+				display: flex;
+				justify-content: center;
+			}
+
+			.inputBox {
+				width: 60%;
+				margin-right: 15px;
+			}
+			.code{
+				font-size: 16px;
+				padding: 5px 0px 5px 10px;
+			}
+			.btn{
+				margin: 10px 0 0 5px;
+			}
+		</style>
+	</head>
+	<body>
+		<!-- 搜索部分 -->
+		<div class="layui-form-item searchBox" id="search">
+			<div class="inputBox">
+				<label class="layui-form-label">试卷名</label>
+				<div class="layui-input-block">
+					<input type="text" autocomplete="off" placeholder="请输入试卷名" class="layui-input" id="examName">
+				</div>
+			</div>
+			<button type="button" class="layui-btn" v-on:click="searchMark">搜索</button>
+		</div>
+
+		<!-- 包裹搜索结果 -->
+		<div class="result-container">
+			<div class="result" id="result">
+				<!-- 数据表格 -->
+				<table class="layui-hide" id="subject-table" lay-filter="clickEvent"></table>
+			</div>
+		</div>
+
+
+		<script type="text/html" id="barDemo">
+			<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+		</script>
+
+		<script src="../../js/api.js"></script>
+		<script src="../../layui/layui.js"></script>
+		<script type="text/javascript">
+			// 搜索
+			var search = new Vue({
+				el: '#search',
+				methods: {
+					searchMark: function() {
+						// 获取试卷名
+						var examName = $('#examName').val()
+						buildMarkTable(examName)
+					}
+				}
+			})
+
+			// 构建成绩表格
+			function buildMarkTable(examName) {
+				layui.use('table', function() {
+					var table = layui.table
+
+					// 配置表格表头信息和获取数据的地址
+					table.render({
+						elem: '#subject-table',
+						id: 'subjectTable',
+						url: apiGetAllMark,
+						method: 'post',
+						where: {
+							name: examName
+						},
+						cellMinWidth: 100,
+						cols: [
+							[{
+									field: 'code',
+									title: '学号',
+									align: 'center'
+								},
+								{
+									field: 'mark',
+									title: '成绩',
+									align: 'center'
+								},
+								{
+									fixed: 'right',
+									width: 180,
+									align: 'center',
+									toolbar: '#barDemo'
+								}
+							]
+						]
+					})
+
+					//监听工具条
+					table.on('tool(clickEvent)', function(obj) {
+						var data = obj.data
+						if (obj.event === 'edit') {
+							// layer.alert('编辑行：<br>' + JSON.stringify(data))
+							editSubject(data)
+						}
+					})
+				})
+			}
+
+			// 编辑题目
+			function editSubject(data) {
+				console.log(data)
+				// 获取学生学号
+				var code = data.code
+				// 获取学生成绩
+				var mark = data.mark
+				// 获取试卷标识
+				var tag = data.qaTag
+				layer.open({
+					type: 1,
+					title: '修改成绩',
+					area: ['500px', '400px'],
+					content: '<div class="code">学号</div>' +
+						'<input type="text" autocomplete="off" value="" disabled class="layui-input layui-disabled" id="code">' +
+						'<div class="code">成绩</div>' +
+						'<input type="text" autocomplete="off" value="" class="layui-input" id="mark">' +
+						'<button type="button" class="layui-btn btn" id="update">提交</button>'
+				})
+				// 给弹窗的输入框赋值
+				$('#code').val(code)
+				$('#mark').val(mark)
+
+				// 提交结果
+				$('#update').click(function() {
+					// 获取修改后的成绩
+					var newMark = $('#mark').val().trim()
+
+					$.ajax({
+						url: apiUpdateMark,
+						type: 'post',
+						data: {
+							"code": code,
+							"mark": newMark,
+							"tag": tag,
+						},
+						success: function(data) {
+							// console.log(data)
+							if (data.code == 0) {
+								layer.alert("修改成功", function() {
+									window.location.reload()
+								})
+							} else if (data.code == -1) {
+								layer.alert("修改失败，请刷新后重试")
+							}
+						},
+						error: function(data) {
+							console.log(data)
+							layer.alert("修改失败，网络异常")
+						}
+					})
+				})
+			}
+		</script>
+	</body>
+</html>

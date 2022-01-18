@@ -98,7 +98,7 @@
 					// 教师
 					parents.push('个人信息管理', '考试管理')
 					selfSeconds.push('修改信息')
-					examSeconds.push('添加试题', '管理试题', '生成试卷', '批改试卷')
+					examSeconds.push('添加试题', '管理试题', '生成试卷', '批改试卷', '查看所有成绩')
 				}else if(identity == 3){
 					// 学生
 					// 先清空原来的列表数据再赋新值
@@ -139,6 +139,10 @@
 							$('#content').attr('src','teacher/judgePaper.html')
 						}else if(clickName == '参加考试'){
 							$('#content').attr('src','student/showExam.html')
+						}else if(clickName == '查看所有成绩'){
+							$('#content').attr('src','teacher/showAllMark.html')
+						}else if(clickName == '成绩查询'){
+							$('#content').attr('src','student/getSelfMark.html')
 						}
 					}
 				}

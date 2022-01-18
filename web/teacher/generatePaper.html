@@ -139,6 +139,7 @@
 								success: function(data) {
 									if (data.code == 0) {
 										layer.alert("组卷成功")
+										window.location.reload()
 									} else if (data.code == -1) {
 										layer.alert("设置时间失败，请刷新后重试")
 									}
