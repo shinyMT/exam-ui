@@ -75,33 +75,42 @@
 					methods: {
 						joinExam: function(event) {
 							var examName = event.currentTarget.lastElementChild.innerText
+							console.log(examName)
 							$.cookie('examName', examName)
 							// 获取当前系统时间
 							var nowTime = new Date().getTime()
 							// console.log(nowTime)
 							// 判断当前是否为考试时间
-							this.checkTime()
+							this.checkTime(examName)
 							
 							var start = new Date($.cookie('startTime')).getTime()
 							var end = new Date($.cookie('endTime')).getTime()
-							// console.log("开始时间：" + start)
-							// console.log("结束时间：" + end)
 							if(nowTime < start){
 								alert("考试暂未开始")
 							}else if(nowTime > end){
 								alert("考试已经结束！")
 							}else{
-								// location.href = "joinExam.html"
-								window.open ('joinExam.html', 'newwindow', 
-											'height=980, width=1900, top=10,left=20, toolbar=no, menubar=no, scrollbars=no, resizable=no,location=no, status=no')
+								// 判断是否提交过试卷
+								var response = this.checkStatus()
+								if(response == 0){
+									window.open ('joinExam.html', 'newwindow',
+												'height=980, width=1900, top=10,left=20, toolbar=no, menubar=no, scrollbars=no, resizable=no,location=no, status=no')
+								}else if(response == -1){
+									alert("您已完成考试，请勿重复进入")
+								}else if(response == -2){
+									alert("获取试卷失败，请稍后重试")
+								}
 							}
 						},
-						checkTime: function() {
+						checkTime: function(examName) {
 							var startTime
 							var endTime
 							$.ajax({
 								url: apiGetTime,
-								type: 'get',
+								type: 'post',
+								data: {
+									"name": examName
+								},
 								dataType: 'json',
 								async: false,
 								success: function(data) {
@@ -118,6 +127,39 @@
 									console.log(data)
 								}
 							})
+						},
+						checkStatus: function(){
+							// 获取当前登录用户的账号
+							var code = $.cookie('account')
+							// 获取当前点击的试卷名
+							var examName = $.cookie('examName')
+							// 定义一个变量存储结果状态
+							var response
+							$.ajax({
+								url: apiCheckStatus,
+								type: 'post',
+								async: false,
+								data: {
+									"code": code,
+									"name": examName
+								},
+								dataType: 'json',
+								success: function(data){
+									console.log(data)
+									if(data.code == 0){
+										response = 0
+									}else if(data.code == -1){
+										response = -1
+									}else if(data.code == -2){
+										response = -2
+									}
+								},
+								error: function(data){
+									alert("网络异常，请稍后重试：" + data.data)
+								}
+							})
+							
+							return response
 						}
 					}
 				})
@@ -125,7 +167,7 @@
 					var qaName = result[i].name
 					nameList.push(qaName)
 				}
-				console.log(nameList)
+				// console.log(nameList)
 				content.qaList = nameList
 			}
 		</script>

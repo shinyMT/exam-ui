@@ -4,7 +4,6 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>在线考试系统</title>
-		<!-- load css -->
 		<link rel="stylesheet" type="text/css" href="layui/css/layui.css" media="all">
 		<link rel="stylesheet" type="text/css" href="css/login.css" media="all">
 		<script src="js/jquery.js"></script>
@@ -36,55 +35,65 @@
 		<script type="text/javascript" src="js/jparticle.jquery.js"></script>
 		<script src="js/api.js"></script>
 		<script type="text/javascript">
+			// 登录
+			function login() {
+				// 获取用户输入的账号密码
+				var code = $('#account').val()
+				var password = $('#password').val()
+				// 向后台发起请求验证账号密码
+				$.ajax({
+					url: apiLogin,
+					type: 'post',
+					dataType: 'json',
+					data: {
+						"code": code,
+						"password": password
+					},
+					success: function(data) {
+						// console.log(data)
+						if (data.code == 0) {
+							// 验证成功
+							var result = data.data
+							console.log(result)
+							// 获取用户的账号和身份信息
+							var account = result[0].code
+							var name = result[0].name
+							var identity = result[0].tag
+							var password = result[0].password
+							// 将信息存储到cookie中
+							$.cookie('account', account)
+							$.cookie('name', name)
+							$.cookie('identity', identity)
+							$.cookie('password', password)
+							// 跳转页面
+							window.location.replace("web/main.html")
+						} else if (data.code < 0) {
+							alert("账号密码错误，请重试")
+						}
+					},
+					error: function(data) {
+						console.log(data)
+					}
+				})
+			}
+			
 			$(function() {
 				// 加载背景样式
 				$(".layui-canvs").jParticle({
 					background: "#141414",
 					color: "#E6E6E6"
-				});
-
-				//登录链接测试，使用时可删除
+				})
+				// 点击登录
 				$('.submit_btn').click(function() {
-					// 获取用户输入的账号密码
-					var code = $('#account').val()
-					var password = $('#password').val()
-					// 向后台发起请求验证账号密码
-					$.ajax({
-						url: apiLogin,
-						type: 'post',
-						dataType: 'json',
-						data: {
-							"code": code,
-							"password": password
-						},
-						success: function(data) {
-							// console.log(data)
-							if (data.code == 0) {
-								// 验证成功
-								var result = data.data
-								console.log(result)
-								// 获取用户的账号和身份信息
-								var account = result[0].code
-								var name = result[0].name
-								var identity = result[0].tag
-								var password = result[0].password
-								// 将信息存储到cookie中
-								$.cookie('account', account)
-								$.cookie('name', name)
-								$.cookie('identity', identity)
-								$.cookie('password', password)
-								// 跳转页面
-								window.location.replace("web/main.html")
-							} else if (data.code < 0) {
-								alert("账号密码错误，请重试")
-							}
-						},
-						error: function(data) {
-							console.log(data)
-						}
-					})
-				});
-			});
+					login()
+				})
+				// 回车登录
+				document.onkeydown = function(e) {
+					if (e.keyCode == 13) {
+						login()
+					}
+				}
+			})
 		</script>
 	</body>
 

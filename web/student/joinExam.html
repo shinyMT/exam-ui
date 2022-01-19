@@ -226,20 +226,27 @@
 					// 结束时间
 					var endTime = new Date(y, M || 0, d || 1, H || 0, m || 0, s || 0)
 					// 获取当前系统时间
-					var serverTime = new Date(); 
-					// 判断当前时间是否已超过结束时间
-					if (serverTime.getTime() >= endTime.getTime()) {
-						// 自动提交试卷
-						btnBox.submitPaper()
-					}
+					var serverTime = new Date()
 
 					clearTimeout(thisTimer)
 					util.countdown(endTime, serverTime, function(date, serverTime, timer) {
 						var str = date[0] - 31 + '天' + date[1] + '时' + date[2] + '分' + date[3] + '秒'
 						lay('#test2').html(str)
-						thisTimer = timer
-					});
-				};
+						// 获取当前系统时间
+						var serverTimeSecond = new Date().getTime()
+						// 获取设置的考试结束时间
+						var endTime = $.cookie('endTime')
+						var endTimeSecond = new Date(endTime).getTime()
+						console.log(serverTimeSecond + ", " + endTimeSecond)
+						// 判断当前时间是否已超过结束时间
+						if(serverTimeSecond >= endTimeSecond){
+							// 自动提交试卷
+							btnBox.submitPaper()
+						}
+						
+						// thisTimer = timer
+					})
+				}
 
 				// 获取考试时间
 				var endTime = $.cookie('endTime')

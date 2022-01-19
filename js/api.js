@@ -43,6 +43,9 @@ var baseApi = "http://127.0.0.1:11013"
  // 获取所有试卷
  var apiGetAllPaper = baseApi + "/all/paper"
  
+ // 判断是否已经提交过试卷
+ var apiCheckStatus = baseApi + "/check/commit"
+ 
  // 获取试卷
  var apiGetPaper = baseApi + "/get/paper"
  
