@@ -22,7 +22,7 @@ var baseApi = "http://127.0.0.1:11013"
  var apiUpdateSubject = baseApi + "/update/subject"
  
  // 设置考试起止时间
- var apiSetTime = baseApi + "/set/time"
+ // var apiSetTime = baseApi + "/set/time"
  
  // 生成试卷
  var apiGenerate = baseApi + "/generate"

@@ -94,59 +94,71 @@
 							var endTime = $('#endTime').val()
 							// 判断是否选择考试时间
 							if (startTime != 0 && endTime != 0) {
-								this.setTime(startTime, endTime)
+								this.generate(startTime, endTime)
 							} else {
 								layer.alert("请设置考试时间后再生成试卷")
 							}
 						},
 						// 生成考试时间
-						setTime: function(startTime, endTime) {
-							// 生成试卷
-							let that = this
-							$.ajax({
-								url: apiSetTime,
-								type: 'post',
-								data: {
-									"startTime": startTime,
-									"endTime": endTime
-								},
-								dataType: 'json',
-								success: function(data) {
-									if (data.code == 0) {
-										// 生成试卷
-										that.generate()
-									} else if (data.code == -1) {
-										layer.alert("设置时间失败，请刷新后重试")
-									}
-								},
-								error: function(data) {
-									console.log(data)
-									layer.alert("设置时间失败，网络异常")
-								}
-							})
-						},
+						// setTime: function(startTime, endTime) {
+						// 	// 生成试卷
+						// 	let that = this
+						// 	$.ajax({
+						// 		url: apiSetTime,
+						// 		type: 'post',
+						// 		data: {
+						// 			"startTime": startTime,
+						// 			"endTime": endTime
+						// 		},
+						// 		dataType: 'json',
+						// 		success: function(data) {
+						// 			if (data.code == 0) {
+						// 				// 生成试卷
+						// 				that.generate()
+						// 			} else if (data.code == -1) {
+						// 				layer.alert("设置时间失败，请刷新后重试")
+						// 			}
+						// 		},
+						// 		error: function(data) {
+						// 			console.log(data)
+						// 			layer.alert("设置时间失败，网络异常")
+						// 		}
+						// 	})
+						// },
 						// 生成试卷
-						generate: function() {
+						generate: function(startTime, endTime) {
 							// 获取试卷名
 							var paperName = $('#paperName').val()
 							// 获取登陆用户的code
 							var account = $.cookie('account')
 							// console.log(account)
 							$.ajax({
-								url: apiGenerate + "?code=" + account + "&name=" + paperName,
-								type: 'get',
+								url: apiGenerate,
+								type: 'post',
+								data: {
+									"code": account,
+									"name": paperName,
+									"startTime": startTime,
+									"endTime": endTime
+								},
 								dataType: 'json',
 								success: function(data) {
 									if (data.code == 0) {
 										layer.alert("组卷成功")
 										window.location.reload()
 									} else if (data.code == -1) {
+										layer.alert("组卷失败，当前试题不足")
+									} else if (data.code == -2) {
+										layer.alert("该试卷名已经存在，请重新命名")
+									} else if (data.code == -3) {
+										layer.alert("存储试卷异常，请稍后重试")
+									} else if (data.code == -4) {
 										layer.alert("设置时间失败，请刷新后重试")
 									}
 								},
 								error: function(data) {
 									console.log(data)
-									layer.alert("设置时间失败，网络异常")
+									layer.alert("组卷失败，网络异常")
 								}
 							})
 						}

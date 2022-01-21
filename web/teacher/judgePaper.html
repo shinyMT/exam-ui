@@ -95,32 +95,36 @@
 							dataType: 'json',
 							success: function(data){
 								console.log(data)
-								var result = data.data[0]
-								
-								// 获取第一题
-								var cqOne = result.cqOne
-								var caOne = result.caOne
-								// 获取第二题
-								var cqTwo = result.cqTwo
-								var caTwo = result.caTwo
-								// 获取第三题
-								var cqThree = result.cqThree
-								var caThree = result.caThree
-								// 获取第四题
-								var eqOne = result.eqOne
-								var eaOne = result.eaOne
-								// 获取第五题
-								var eqTwo = result.eqTwo
-								var eaTwo = result.eaTwo
-								// 将试卷赋值到文本域中
-								$('#subject').val("1. " + cqOne + "\n答：" + caOne + "\n" +
-								"2. " + cqTwo + "\n答：" + caTwo + "\n" +
-								"3. " + cqThree + "\n答：" + caThree + "\n" +
-								"4. " + eqOne + "\n答：" + eaOne + "\n" +
-								"5. " + eqTwo + "\n答：" + eaTwo)
+								if(data.code == 0){
+									var result = data.data[0]
+									
+									// 获取第一题
+									var cqOne = result.cqOne
+									var caOne = result.caOne
+									// 获取第二题
+									var cqTwo = result.cqTwo
+									var caTwo = result.caTwo
+									// 获取第三题
+									var cqThree = result.cqThree
+									var caThree = result.caThree
+									// 获取第四题
+									var eqOne = result.eqOne
+									var eaOne = result.eaOne
+									// 获取第五题
+									var eqTwo = result.eqTwo
+									var eaTwo = result.eaTwo
+									// 将试卷赋值到文本域中
+									$('#subject').val("1. " + cqOne + "\n答：" + caOne + "\n" +
+									"2. " + cqTwo + "\n答：" + caTwo + "\n" +
+									"3. " + cqThree + "\n答：" + caThree + "\n" +
+									"4. " + eqOne + "\n答：" + eaOne + "\n" +
+									"5. " + eqTwo + "\n答：" + eaTwo)
+								}else if(data.code == -1){
+									alert("该学生没有试卷信息")
+								}
 							},
 							error: function(data){
-								console.log(data)
+								alert("出现网络异常，请刷新后重试")
 							}
 						})
 					}
