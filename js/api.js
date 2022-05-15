@@ -39,6 +39,9 @@ var baseApi = "http://127.0.0.1:11013"
  // 修改学生成绩
  var apiUpdateMark = baseApi + "/update/mark"
  
+ // 查询试卷标准答案
+ var apiGetAnswer = baseApi + "/get/answer"
+ 
 // ----------------学生---------------
  // 获取所有试卷
  var apiGetAllPaper = baseApi + "/all/paper"

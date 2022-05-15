@@ -8,6 +8,10 @@
 		<script src="../../js/jquery.cookie.js"></script>
 		<script src="../../js/vue.js"></script>
 		<style type="text/css">
+			#search{
+				width: 100%;
+				height: 100%;
+			}
 			.searchBox {
 				width: 100%;
 				margin: 10px 0 0 10px;
@@ -19,8 +23,15 @@
 				width: 60%;
 				margin-right: 15px;
 			}
-			.subject, .mark{
+			.subject{
 				width: 70%;
+				height: 80%;
+				margin-top: 10px;
+				margin-bottom: 10px;
+			}
+			.mark{
+				width: 70%;
+				height: 20%;
 				margin-top: 10px;
 				margin-bottom: 10px;
 			}
@@ -36,26 +47,43 @@
 		</style>
 	</head>
 	<body>
-		<!-- 搜索部分 -->
-		<div class="layui-form-item searchBox" id="search">
-			<div class="inputBox">
-				<label class="layui-form-label">学生学号</label>
-				<div class="layui-input-block">
-					<input type="text" autocomplete="off" placeholder="请输入学生学号"
-						class="layui-input" id="code">
+		<div id="search">
+			<!-- 搜索部分 -->
+			<div class="layui-form-item searchBox">
+				<div class="inputBox">
+					<label class="layui-form-label">学生学号</label>
+					<div class="layui-input-block">
+						<input type="text" autocomplete="off" placeholder="请输入学生学号"
+							class="layui-input" id="code">
+					</div>
+					<br />
+					<label class="layui-form-label">试卷名</label>
+					<div class="layui-input-block">
+						<input type="text" autocomplete="off" placeholder="请输入试卷名"
+							class="layui-input" id="examName">
+					</div>
 				</div>
-				<br />
-				<label class="layui-form-label">试卷名</label>
-				<div class="layui-input-block">
-					<input type="text" autocomplete="off" placeholder="请输入试卷名"
-						class="layui-input" id="examName">
-				</div>
+				<button type="button" class="layui-btn" v-on:click="searchSub">搜索</button>
 			</div>
-			<button type="button" class="layui-btn" v-on:click="searchSub">搜索</button>
-		</div>
-		<!-- 试卷-->
-		<div class="layui-input-block subject">
-			<textarea class="layui-textarea" id="subject"></textarea>
+			<!-- 学生试卷-->
+			<div class="layui-input-block subject" id="subject">
+				<!-- <textarea class="layui-textarea" id="subject"></textarea> -->
+				<form class="layui-form layui-form-pane" action="" v-for="(item, index) in paper">
+					<div class="layui-form-item">
+						<label class="layui-form-label">题目{{index + 1}}</label>
+						<div class="layui-input-block">
+							<input :value="item.title" type="text" name="title" autocomplete="off" class="layui-input" id="title">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">答案</label>
+						<div class="layui-input-block">
+							<input :value="item.answer" type="text" name="title" autocomplete="off"
+								 class="layui-input answer" id="answer">
+						</div>
+					</div>
+				</form>
+			</div>
 		</div>
 		<!-- 打分 -->
 		<div class="layui-input-block mark">
@@ -67,10 +95,14 @@
 			<button type="button" class="layui-btn" v-on:click="commitMark">提交</button>
 		</div>
 		
+		
 		<script src="../../js/api.js"></script>
 		<script type="text/javascript">
 			var search = new Vue({
 				el: '#search',
+				data: {
+					paper: []
+				},
 				methods:{
 					searchSub: function(){
 						// 根据学号和试卷名获取学生的试卷
@@ -82,9 +114,61 @@
 						if(code != null && examName != null){
 							// 获取学生试卷
 							this.getPaper(code, examName)
+							
+						}else{
+							alert("学生学号或试卷名不能为空")
 						}
 					},
+					changeErrorStyle: function(errCaOne, errCaTwo, errCaThree){
+						// console.log(errCaOne, errCaTwo, errCaThree)
+						if(errCaOne != ""){
+							document.getElementsByClassName("layui-input answer")[0].style.color = 'red'
+						}
+						if(errCaTwo != ""){
+							document.getElementsByClassName("layui-input answer")[1].style.color = 'red'
+						}
+						if(errCaThree != ""){
+							document.getElementsByClassName("layui-input answer")[2].style.color = 'red'
+						}
+					},
+					getRightAnswer: function(qaTag){
+						// 定义一个对象存放选择题的标准答案
+						var rightAnsObj = {}
+						$.ajax({
+							url: apiGetAnswer,
+							type: 'post',
+							data: {
+								tag: qaTag
+							},
+							async: false,
+							success: function(data){
+								// console.log(data.data[0])
+								// 获取选择题的正确答案
+								if(data.code == 0){
+									const cqOneAnswer = data.data[0].cqOneAnswer
+									const cqTwoAnswer = data.data[0].cqTwoAnswer
+									const cqThreeAnswer = data.data[0].cqThreeAnswer
+									rightAnsObj = {
+										"cqOneAnswer": cqOneAnswer,
+										"cqTwoAnswer": cqTwoAnswer,
+										"cqThreeAnswer": cqThreeAnswer
+									}
+								}
+							},
+							error: function(data){
+								alert("网络异常，请刷新后重试")
+							}
+						})
+						
+						return rightAnsObj
+					},
 					getPaper: function(code, name){
+						// 定义三个变量分别存放错误的答案信息
+						var errCaOne = ""
+						var errCaTwo = ""
+						var errCaThree = ""
+						
+						let that = this
 						$.ajax({
 							url: apiGetStudentPaper,
 							type: 'post',
@@ -94,31 +178,72 @@
 							},
 							dataType: 'json',
 							success: function(data){
-								console.log(data)
+								// console.log(data)
+								// 根据试卷标识符获取对应试卷的标准答案
+								const qaTag = data.data[0].qaTag
+								// console.log(qaTag)
+								var rightAnswer = that.getRightAnswer(qaTag)
 								if(data.code == 0){
 									var result = data.data[0]
 									
 									// 获取第一题
 									var cqOne = result.cqOne
 									var caOne = result.caOne
+									var cqOneAns = rightAnswer.cqOneAnswer
 									// 获取第二题
 									var cqTwo = result.cqTwo
 									var caTwo = result.caTwo
+									var cqTwoAns = rightAnswer.cqTwoAnswer
 									// 获取第三题
 									var cqThree = result.cqThree
 									var caThree = result.caThree
+									var cqThreeAns = rightAnswer.cqThreeAnswer
 									// 获取第四题
 									var eqOne = result.eqOne
 									var eaOne = result.eaOne
 									// 获取第五题
 									var eqTwo = result.eqTwo
 									var eaTwo = result.eaTwo
+									
+									// 将学生答的选择题和标准答案做对比
+									if(caOne != cqOneAns){
+										errCaOne = caOne
+									}
+									if(caTwo != cqTwoAns){
+										errCaTwo = caTwo
+									}
+									if(caThree != cqThreeAns){
+										errCaThree = caThree
+									}
+									
 									// 将试卷赋值到文本域中
-									$('#subject').val("1. " + cqOne + "\n答：" + caOne + "\n" +
-									"2. " + cqTwo + "\n答：" + caTwo + "\n" +
-									"3. " + cqThree + "\n答：" + caThree + "\n" +
-									"4. " + eqOne + "\n答：" + eaOne + "\n" +
-									"5. " + eqTwo + "\n答：" + eaTwo)
+									that.paper = [
+										{
+											title: cqOne,
+											answer: caOne
+										},
+										{
+											title: cqTwo,
+											answer: caTwo
+										},
+										{
+											title: cqThree,
+											answer: caThree
+										},
+										{
+											title: eqOne,
+											answer: eaOne
+										},
+										{
+											title: eqTwo,
+											answer: eaTwo
+										}
+									]
+									// 将错误的选项标为红色，设置500ms后执行，避免组件未加载完成导致渲染失败
+									setTimeout(() => {
+										that.changeErrorStyle(errCaOne, errCaTwo, errCaThree)
+									}, 500)
+									
 								}else if(data.code == -1){
 									alert("该学生没有试卷信息")
 								}

@@ -60,6 +60,7 @@
 						{field: 'type', title: '题目类型', templet: function(d){
 							return d.type == 1 ? '选择题' : '问答题'
 						}},
+						{field: 'answer', title: '题目答案'},
 						{fixed: 'right', width:180, align:'center', toolbar: '#barDemo'}
 					]]
 				})
@@ -123,6 +124,8 @@
 				var choice = data.choice
 				// 获取题目类型
 				var type = data.type
+				// 获取题目答案
+				var answer = data.answer
 				layer.open({
 					type: 1,
 					title: '修改试题',
@@ -131,8 +134,10 @@
 					'<input type="text" name="title" autocomplete="off" value="" class="layui-input" id="title">' +
 					'<div class="title">选项</div>' +
 					'<input type="text" name="choice" autocomplete="off" value="" class="layui-input" id="choice">' +
-					'<div class="title">选项</div>' +
+					'<div class="title">题目类型</div>' +
 					'<input type="text" name="type" autocomplete="off" value="" placeholder="请输入完整名称，例如：选择题或问答题" class="layui-input" id="type">' + 
+					'<div class="title">题目答案</div>' +
+					'<input type="text" name="answer" autocomplete="off" value="" class="layui-input" id="answer">' +
 					'<button type="button" class="layui-btn btn" id="update">提交</button>'
 				})
 				// 给弹窗的输入框赋值
@@ -141,6 +146,7 @@
 				$('#type').val(function(){
 					return type == 1 ? '选择题' : '问答题'
 				})
+				$('#answer').val(answer)
 				
 				// 提交结果
 				$('#update').click(function(){
@@ -157,6 +163,8 @@
 					}else if(newTypeValue == "问答题"){
 						newType = 2
 					}
+					// 修改后的答案值
+					var newAnswer = $('#answer').val().trim()
 					
 					$.ajax({
 						url: apiUpdateSubject,
@@ -165,7 +173,8 @@
 							"id": id,
 							"title": newTitle,
 							"choice": newChoice,
-							"type": newType
+							"type": newType,
+							"answer": newAnswer
 						},
 						success: function(data){
 							// console.log(data)
