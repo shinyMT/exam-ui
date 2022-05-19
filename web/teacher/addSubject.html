@@ -51,7 +51,7 @@
 				<label class="layui-form-label">答案</label>
 				<div class="layui-input-block">
 					<input type="text" name="title" autocomplete="off"
-						placeholder="例如：A" class="layui-input" id="choice">
+						placeholder="例如：A" class="layui-input" id="answer">
 				</div>
 			</div>
 			<div class="layui-form-item" pane="">
@@ -83,14 +83,16 @@
 							var choice = $('#choice').val()
 							// 获取题目类型
 							let type = $('input[name="type"]:checked ').val()
-							
+							// 获取题目答案
+							let answer = $('#answer').val()
 							$.ajax({
 								url: apiAddSubject,
 								type: 'post',
 								data:{
 									"title": title,
 									"choice": choice,
-									"type": type
+									"type": type,
+									"answer": answer
 								},
 								dataType: 'json',
 								success: function(data){
